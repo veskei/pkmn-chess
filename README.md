@@ -2,7 +2,7 @@
 
 ## About ##
 
-A game inspired by [this reddit post](https://www.reddit.com/r/AnarchyChess/comments/qnlj27/chess_but_if_a_piece_lands_on_an_opposing_piece/), created in Unity. A more detailed youtube video of how it was done can be [found here](https://www.youtube.com/channel/UCdXqxD54HrI4qcK82u0vvFg)
+A game inspired by [this reddit post](https://www.reddit.com/r/AnarchyChess/comments/qnlj27/chess_but_if_a_piece_lands_on_an_opposing_piece/), created in Unity. A more detailed youtube video of how it was done can be [found here](https://www.youtube.com/watch?v=AhPbSiMereA)
 
 
 ## Play Inception ##
