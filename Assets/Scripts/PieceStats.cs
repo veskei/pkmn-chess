@@ -36,11 +36,11 @@ public class PieceStats : MonoBehaviour
             piece_stats[1].abilities[0] = new Ability();
             piece_stats[1].abilities[0].ability_name = "Strike";
             piece_stats[1].abilities[0].ability_max = 10;
-            piece_stats[1].abilities[0].ability_min = 5;
+            piece_stats[1].abilities[0].ability_min = 7;
 
             piece_stats[1].abilities[1] = new Ability();
             piece_stats[1].abilities[1].ability_name = "Block";
-            piece_stats[1].abilities[1].ability_max = 10;
+            piece_stats[1].abilities[1].ability_max = 8;
             piece_stats[1].abilities[1].ability_min = 5;
             piece_stats[1].abilities[1].defense = true;
         }
@@ -136,8 +136,8 @@ public class PieceStats : MonoBehaviour
 
             piece_stats[5].abilities[2] = new Ability();
             piece_stats[5].abilities[2].ability_name = "Impale";
-            piece_stats[5].abilities[2].ability_max = 30;
-            piece_stats[5].abilities[2].ability_min = 20;
+            piece_stats[5].abilities[2].ability_max = 25;
+            piece_stats[5].abilities[2].ability_min = 15;
             piece_stats[5].abilities[2].weakened = true;
 
             piece_stats[5].abilities[3] = new Ability();
@@ -154,7 +154,7 @@ public class PieceStats : MonoBehaviour
             piece_stats[6].health = 25;
 
             piece_stats[6].abilities[0] = new Ability();
-            piece_stats[5].abilities[0].ability_name = "Strike";
+            piece_stats[6].abilities[0].ability_name = "Strike";
             piece_stats[6].abilities[0].ability_max = 12;
             piece_stats[6].abilities[0].ability_min = 8;
 
@@ -165,18 +165,10 @@ public class PieceStats : MonoBehaviour
             piece_stats[6].abilities[1].defense = true;
 
             piece_stats[6].abilities[2] = new Ability();
-            piece_stats[6].abilities[2].ability_name = "Smite";
+            piece_stats[6].abilities[2].ability_name = "Royal Smack";
             piece_stats[6].abilities[2].ability_max = 40;
-            piece_stats[6].abilities[2].ability_min = 20;
+            piece_stats[6].abilities[2].ability_min = 25;
             piece_stats[6].abilities[2].weakened = true;
         }
-
-        Debug.Log(piece_stats);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

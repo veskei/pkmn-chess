@@ -143,7 +143,7 @@ public class Piece : MonoBehaviour
                     new_pos = new Vector2(dir_x, dir_y);
 
                     if (board.IsLineOfFire(team, dir_x, dir_y))
-                        Debug.Log(team + ". Line of fire. King Cannot move there.");
+                        continue;
                     else if (board.IsSquareEnemy(team, dir_x, dir_y) && !board.IsGuarded(dir_x, dir_y))
                         attack_moves.Add(new_pos);
                     else if (board.IsSquareFriend(this, team, dir_x, dir_y))

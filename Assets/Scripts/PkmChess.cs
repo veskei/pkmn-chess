@@ -39,12 +39,6 @@ public class PkmChess : MonoBehaviour
         flasher.CrossFadeAlpha(0f, 0f, false);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void GameStart(Piece a, Piece d)
     {
         StartCoroutine(Flashing(a, d));
@@ -90,11 +84,12 @@ public class PkmChess : MonoBehaviour
     // Slides in pieces from sides to position
     public IEnumerator Slider()
     {
-        for (int i = 1200; i > 150; i--)
+        for (int i = 1200; i > 150; i-=5)
         {
             player_pad.rectTransform.localPosition = new Vector2(i-450, player_pad.rectTransform.localPosition.y);
             enemy_pad.rectTransform.localPosition = new Vector2(-i + 450, enemy_pad.rectTransform.localPosition.y);
-            yield return new WaitForSeconds(Time.deltaTime * slide_speed);
+            yield return new WaitForSeconds(0.01f);
+
         }
 
         yield return new WaitForSeconds(0.3f);
@@ -146,12 +141,13 @@ public class PkmChess : MonoBehaviour
 
     public void UseAbility(int n)
     {
+        StopAllCoroutines();
         StartCoroutine(PlayerAnim(n));
     }
 
     public void Run()
     {
-        GameEnd(PieceTeam.Black);
+        StartCoroutine(GameEnd(PieceTeam.Black));
     }
 
     public IEnumerator PlayerAnim(int n)
@@ -264,7 +260,7 @@ public class PkmChess : MonoBehaviour
         }
         else if (enemy_weak)
         {
-            dmg = (int)(dmg * 2f);
+            dmg = (int)(dmg * 1.3f);
         }
 
         if (dmg == 0)
@@ -402,6 +398,8 @@ public class PkmChess : MonoBehaviour
         if (enemy_next_turn.defense)
             attacking_menu.SetActive(false);
 
+        SetEnemyAbility();
+
     }
 
     public IEnumerator DealDamageToPlayer()
@@ -417,7 +415,7 @@ public class PkmChess : MonoBehaviour
         }
         else if (player_weak)
         {
-            dmg = (int)(dmg * 2f);
+            dmg = (int)(dmg * 1.3f);
         }
 
         if (dmg == 0)
@@ -458,18 +456,20 @@ public class PkmChess : MonoBehaviour
         else
             attacking_menu.SetActive(false);
 
-        SetEnemyAbility();
+        
     }
 
     void SetEnemyAbility()
     {
         int n = Random.Range(0, enemy_piece.abilities.Length);
 
-        while (enemy_piece.abilities[n] == null)
+        while (enemy_piece.abilities[n] == null || enemy_next_turn == enemy_piece.abilities[n])
+        {
             n = Random.Range(0, enemy_piece.abilities.Length);
+        }
 
         enemy_next_turn = enemy_piece.abilities[n];
-
+        Debug.Log(enemy_next_turn.ability_name);
         if (!enemy_next_turn.defense)
             enemy_indicator.sprite = attack_indicator;
         else

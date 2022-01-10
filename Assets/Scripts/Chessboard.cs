@@ -10,6 +10,7 @@ public class Chessboard : MonoBehaviour
     public Piece[] all_pieces;
     public List<Piece> black_pieces = new List<Piece>();
     public List<Piece> white_pieces = new List<Piece>();
+
     public GameObject move_circle;
     public GameObject attack_circle;
     public GameManager gm_script;
@@ -22,9 +23,15 @@ public class Chessboard : MonoBehaviour
     // Used to reset the board to the original state
     public void ResetPieces()
     {
+        Debug.Log("Resetting All Pieces");
         foreach (Piece p in all_pieces)
         {
-            p.gameObject.SetActive(true);
+            if (p == null)
+                continue;
+
+            if (!p.gameObject.activeSelf)
+                p.gameObject.SetActive(true);
+
             p.ResetPiece();
         }
         
@@ -32,15 +39,16 @@ public class Chessboard : MonoBehaviour
     }
 
     // Used to set the board to its initial state.
-    public void SetPieces()
+    public void SetPieces(string tag)
     {
         Piece p;
-        foreach (GameObject g in GameObject.FindGameObjectsWithTag(gm_script.CUR_TAG))
+        foreach (GameObject g in GameObject.FindGameObjectsWithTag(tag))
         {
             p = g.GetComponent<Piece>();
             p.Init();
             p.guards.Clear();
             board_status[p.position_x, p.position_y] = p;
+
             if (p.team == PieceTeam.White)
                 white_pieces.Add(p);
             else
@@ -231,7 +239,7 @@ public class Chessboard : MonoBehaviour
     }    
 
     // TODO: Rework
-
+ 
     // Checks if that square can be moved to by a piece of a certain team. Used to determine if king is in checkmate.
     public bool IsSquareMovableTo(PieceTeam t, int x, int y)
     {
@@ -400,7 +408,7 @@ public class Chessboard : MonoBehaviour
             }
 
             // All other attacks
-            else  if (board_status[(int)pos.x, (int)pos.y].type == PieceType.King)
+            else  if (board_status[(int)pos.x, (int)pos.y].type == PieceType.King && !gm_script.playing_main)
             {
                 return 4;
             }

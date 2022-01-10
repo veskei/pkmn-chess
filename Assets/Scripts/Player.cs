@@ -12,10 +12,11 @@ public class Player : MonoBehaviour
     public bool can_play;
 
 
+
     void Update()
     {
-       // if (!gm_script.MyTurnToPlay(team) || !can_play)
-        //    return;
+        if (!gm_script.MyTurnToPlay(team) || !can_play)
+            return;
 
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 

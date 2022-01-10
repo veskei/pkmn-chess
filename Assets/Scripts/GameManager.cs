@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum GameState
 {
@@ -33,20 +34,34 @@ public class GameManager : MonoBehaviour
     public string MAIN_TAG, SEC_TAG, CUR_TAG;
     public Piece s_attacker, s_defender; // Pieces that are involved in the fight on the second board. loser dies.
 
-
+    public GameObject end_screen;
+    public Text end_text;
     // For fight animation
     public Image top, bottom;
     Vector3 start_top, start_bottom;
     // Start is called before the first frame update
     void Start()
     {
-        game_type = GameObject.FindGameObjectWithTag("GameMode").GetComponent<GameMode>().game_type;
-
+        try
+        {
+            game_type = GameObject.FindGameObjectWithTag("GameMode").GetComponent<GameMode>().game_type;
+            GameObject.FindGameObjectWithTag("GameMode").GetComponent<GameMode>().gm_script = this;
+        }
+        catch
+        {
+            Debug.Log("Game Type not found. Using Default");
+        }
+        
         current_board = main_board;
+
         top.CrossFadeAlpha(0, 0.0f, false);
         bottom.CrossFadeAlpha(0, 0.0f, false);
-        main_board.SetPieces();
+
+        main_board.SetPieces(MAIN_TAG);
         main_board.RefreshBoard();
+
+        secondary_board.SetPieces(SEC_TAG);
+
         comp.SetPieces();
         start_top = top.rectTransform.localPosition;
         start_bottom = bottom.rectTransform.localPosition;
@@ -58,42 +73,26 @@ public class GameManager : MonoBehaviour
     {
         game_state.text = "Status: " + state;
         cam.transform.position = Vector3.Lerp(cam.transform.position, cam_positions[cur_pos].transform.position, Time.deltaTime*lerp_speed);
-
     }
 
     public void MovePiece (Piece p, Vector2 pos)
     {
         int state_ = current_board.MoveTo(p, pos);
-
-        current_board.HideMoves();
-
-        if (state_ == 1 || state_ == 3 || (state_ == 2 && !playing_main))
-        {
-            if (current_player == PieceTeam.White)
-            {
-                state = GameState.BlackTurn;
-                current_player = PieceTeam.Black;
-                //comp.MoveRandomPiece();
-            }
-            else if (current_player == PieceTeam.Black)
-            {
-                state = GameState.WhiteTurn;
-                current_player = PieceTeam.White;
-            }
-            current_board.RefreshBoard();
-        }
+        Debug.Log("State: " + state_);
 
         if (game_type == 1)
         {
             if (state_ == 2 && playing_main)
             {
                 StartCoroutine(StartSecondary(p, current_board.board_status[(int)pos.x, (int)pos.y]));
+                return;
             }
 
             if (state_ == 4 && playing_main)
             {
                 // The king is the victim.
                 StartCoroutine(StartSecondary(p, current_board.board_status[(int)pos.x, (int)pos.y]));
+                return;
             }
         }
         else if (state_ == 2 && game_type == 2)
@@ -104,6 +103,26 @@ public class GameManager : MonoBehaviour
             p.transform.position = Vector3.Lerp(p.transform.position, current_board.board_status[(int)pos.x, (int)pos.y].transform.position, 0.95f);
             main_player = (PieceTeam)((int)current_player * (int)PieceTeam.Black);
             pkmn_script.GameStart(s_attacker, s_defender);
+            return;
+        }
+
+        if (state_ == 1 || state_ == 3 || (state_ == 2 && !playing_main))
+        {
+            if (current_player == PieceTeam.White)
+            {
+                comp.cancel_move = false;
+                state = GameState.BlackTurn;
+                current_player = PieceTeam.Black;
+                current_board.RefreshBoard();
+                comp.MoveRandomPiece();
+            }
+            else if (current_player == PieceTeam.Black)
+            {
+                state = GameState.WhiteTurn;
+                current_player = PieceTeam.White;
+            }
+
+            current_board.RefreshBoard();
         }
     }
 
@@ -129,8 +148,7 @@ public class GameManager : MonoBehaviour
         s_defender = defender;
         CUR_TAG = SEC_TAG;
         current_board = secondary_board;
-        current_board.SetPieces();
-        current_board.RefreshBoard();
+        current_board.ResetPieces();
         attacker.transform.position = Vector3.Lerp(attacker.transform.position, defender.transform.position, 0.95f);
         
 
@@ -161,7 +179,8 @@ public class GameManager : MonoBehaviour
 
         playing_main = false;
         current_player = PieceTeam.White;
-        comp.SetPieces();
+        current_board.RefreshBoard();
+        comp.ChangeBoard();
         top.rectTransform.localPosition = start_top;
         bottom.rectTransform.localPosition = start_bottom;
         player.can_play = true;
@@ -169,28 +188,47 @@ public class GameManager : MonoBehaviour
 
     public void GameWon(PieceTeam winning_team)
     {
+        if (playing_main)
+        {
+            SceneManager.LoadScene(0);
+            return;
+        }
+
         if (!playing_main)
             EndSecondary(winning_team);
+
     }
 
     public void EndSecondary(PieceTeam winner)
     {
+        
         current_board = main_board;
+        
+
         if (winner == s_attacker.team)
         {
             s_attacker.MoveTo(s_defender.position_x, s_defender.position_y);
             s_defender.gameObject.SetActive(false);
+
+            if (s_defender.type == PieceType.King)
+                StartCoroutine(GameEnd(s_attacker.team));
         }
         else if (winner == s_defender.team)
         {
             s_attacker.gameObject.SetActive(false);
+
+            if (s_attacker.type == PieceType.King)
+                StartCoroutine(GameEnd(s_defender.team));
         }
 
-        current_player = main_player;
+        current_player = PieceTeam.White;
+        state = GameState.WhiteTurn;
         playing_main = true;
         cur_pos = 0;
         CUR_TAG = MAIN_TAG;
         current_board.RefreshBoard();
+
+        Debug.Log("A");
 
         if (game_type == 1)
             Invoke("ResetSecondary", 1f);
@@ -200,6 +238,7 @@ public class GameManager : MonoBehaviour
 
     public void ResetSecondary()
     {
+        Debug.Log("Resetting Secondary Board");
         secondary_board.ResetPieces();
     }
 
@@ -209,7 +248,40 @@ public class GameManager : MonoBehaviour
             return;
 
         EndSecondary(winner);
+    }
 
-       //EndSecondary(t);
+    public IEnumerator GameEnd(PieceTeam winner)
+    {
+        // Show End screen.
+        player.enabled = false;
+        yield return new WaitForSeconds(1f);
+        Time.timeScale = 0f;
+
+        if (winner == player.team)
+            end_text.text = "You Win!";
+        else
+            end_text.text = "Womp womp. \nYou Lose!";
+
+        end_screen.SetActive(true);
+    }
+
+    public void RestartGame()
+    {
+        // Give option to restart game mode
+        Time.timeScale = 1f;
+        GameObject.FindGameObjectWithTag("GameMode").GetComponent<GameMode>().RestartGame();
+    }
+
+    public void BackToMenu()
+    {
+        // Give option to go back to main menu.
+        Time.timeScale = 1f;
+        GameObject.FindGameObjectWithTag("GameMode").GetComponent<GameMode>().BackToMenu();
+    }
+
+    public void Concede()
+    {
+        // Give option to go back to main menu.
+        StartCoroutine(GameEnd(PieceTeam.Black));
     }
 }

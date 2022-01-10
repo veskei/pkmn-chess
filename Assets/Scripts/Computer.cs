@@ -18,7 +18,7 @@ public class Computer : MonoBehaviour
     public GameManager gm_script;
     public PieceTeam team;
     public List<Piece> my_pieces = new List<Piece>();
-
+    public bool cancel_move = false;
     public void SetPieces()
     {
         my_pieces.Clear();
@@ -42,8 +42,22 @@ public class Computer : MonoBehaviour
         Invoke("MovePiece", 0.5f);
     }
 
+    public void ChangeBoard()
+    {
+        cancel_move = true;
+        CancelInvoke("MovePiece");
+        SetPieces();
+    }
+
     void MovePiece()
     {
+        if (cancel_move)
+        {
+            cancel_move = false;
+            return;
+        }
+
+
         PieceValue current_target = PieceValue.None;
         Piece current_piece = null;
         Vector2 target_square = Vector2.zero;
@@ -81,12 +95,12 @@ public class Computer : MonoBehaviour
 
             }
             target_square = current_piece.valid_moves[Random.Range(0, current_piece.valid_moves.Count)];
-            gm_script.current_board.MoveTo(current_piece, target_square);
+            gm_script.MovePiece(current_piece, target_square);
         }
         else
         {
-            gm_script.current_board.MoveTo(current_piece, target_square);
-            Debug.Log(FEN_Notation());
+            gm_script.MovePiece(current_piece, target_square);
+            //Debug.Log(FEN_Notation());
         }
     }
 
