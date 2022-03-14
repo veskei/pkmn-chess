@@ -221,6 +221,10 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(GameEnd(s_defender.team));
         }
 
+        //when a secondary game ends, and white wins, black does not automatically move a random piece, and so the game is stuck in limbo
+        //not sure how you would fix this but maybe just try
+        //comp.MoveRandomPiece();
+
         current_player = PieceTeam.White;
         state = GameState.WhiteTurn;
         playing_main = true;
