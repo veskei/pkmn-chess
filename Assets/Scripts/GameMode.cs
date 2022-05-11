@@ -12,9 +12,7 @@ public class GameMode : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(transform.gameObject);
-
     }
-
 
     public void ActivateGameMode(int n)
     {

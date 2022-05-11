@@ -1,8 +1,15 @@
 <linker>
 	<assembly fullname="Assembly-CSharp" ignoreIfMissing="1">
+		<type fullname="GameManager">
+			<method name="BackToMenu"/>
+			<method name="Concede"/>
+			<method name="RestartGame"/>
+		</type>
 		<type fullname="GameMode">
 			<method name="ActivateGameMode"/>
 			<method name="ActivateGameMode"/>
+			<method name="CloseAbout"/>
+			<method name="ShowAbout"/>
 		</type>
 		<type fullname="PkmChess">
 			<method name="Run"/>

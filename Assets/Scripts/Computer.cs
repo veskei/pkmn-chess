@@ -36,7 +36,6 @@ public class Computer : MonoBehaviour
         }
     }
 
-
     public void MoveRandomPiece()
     {
         Invoke("MovePiece", 0.5f);
@@ -102,92 +101,5 @@ public class Computer : MonoBehaviour
             gm_script.MovePiece(current_piece, target_square);
             //Debug.Log(FEN_Notation());
         }
-    }
-
-    string FEN_Notation()
-    {
-        int empty_ranks = 0;
-        string placement = "";
-        string castling = "";
-        string w_k = "", w_q = "", b_k = "", b_q = "";
-        string en_passant = "";
-        char cur_piece;
-        Piece p;
-
-        for (int y = gm_script.current_board.board_status.GetLength(1)-1; y > 0; y--)
-        {
-            for (int x = 1; x <= gm_script.current_board.board_status.GetLength(0) - 1; x++) 
-            {
-                
-                if (gm_script.current_board.board_status[x, y] == null && x == gm_script.current_board.board_status.GetLength(0) - 1)
-                {
-                    empty_ranks++;
-                    placement += empty_ranks.ToString();
-                    empty_ranks = 0;
-                    continue;
-                }
-                else if (gm_script.current_board.board_status[x, y] == null)
-                {
-                    empty_ranks++;
-                    continue;
-                }
-                else if (gm_script.current_board.board_status[x, y] != null && empty_ranks > 0)
-                {
-                    placement += empty_ranks.ToString();
-                    empty_ranks = 0;
-                }
-
-                p = gm_script.current_board.board_status[x, y];
-
-                if (p.type == PieceType.Pawn)
-                {
-                    cur_piece = 'p';
-                    if (p.en_passant)
-                    {
-                        en_passant += (Files)p.position_x + "" +  p.position_y;
-                    }
-                }
-                else if (p.type == PieceType.Knight)
-                    cur_piece = 'n';
-                else if (p.type == PieceType.Bishop)
-                    cur_piece = 'b';
-                else if (p.type == PieceType.Queen)
-                    cur_piece = 'q';
-                else if (p.type == PieceType.King)
-                {
-                    cur_piece = 'k';
-
-                    // Tagging castling moves if they are available
-                    if (p.castle_long && p.team == PieceTeam.White)
-                        w_q = "Q";
-                    if (p.castle_short && p.team == PieceTeam.White)
-                        w_k = "K";
-                    if (p.castle_long && p.team == PieceTeam.Black)
-                        b_q = "q";
-                    if (p.castle_short && p.team == PieceTeam.Black)
-                        b_k = "k";
-                }
-                else if (p.type == PieceType.Rook)
-                    cur_piece = 'r';
-                else
-                    cur_piece = 'a';
-
-                if (p.team == PieceTeam.White)
-                    placement += cur_piece.ToString().ToUpper();
-                else
-                    placement += cur_piece.ToString();
-            }
-            placement += "/";
-        }
-
-        
-        placement = placement.Substring(0, placement.Length - 1);
-        castling = w_k + w_q + b_k + b_q;
-
-        if (castling.Length == 0)
-            castling = "-";
-
-        placement = placement + " " + gm_script.current_player.ToString().Substring(0, 1).ToLower() + " " + castling + " 1 2";
-        return placement;
     }
 }
