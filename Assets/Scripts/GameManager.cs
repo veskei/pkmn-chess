@@ -201,31 +201,24 @@ public class GameManager : MonoBehaviour
 
     public void EndSecondary(PieceTeam winner)
     {
-        Debug.Log("Ending Secondary");
         current_board = main_board;
         comp.cancel_move = true;
 
         if (winner == s_attacker.team)
         {
-            Debug.Log("aa");
             s_attacker.MoveTo(s_defender.position_x, s_defender.position_y);
             s_defender.gameObject.SetActive(false);
 
             if (s_defender.type == PieceType.King)
                 StartCoroutine(GameEnd(s_attacker.team));
-            Debug.Log("ab");
         }
         else if (winner == s_defender.team)
         {
-            Debug.Log("ac");
             s_attacker.gameObject.SetActive(false);
 
             if (s_attacker.type == PieceType.King)
                 StartCoroutine(GameEnd(s_defender.team));
-            Debug.Log("ad");
         }
-
-        Debug.Log("ae");
 
         current_player = PieceTeam.White;
         state = GameState.WhiteTurn;
@@ -234,14 +227,11 @@ public class GameManager : MonoBehaviour
         CUR_TAG = MAIN_TAG;
         current_board.RefreshBoard();
 
-        Debug.Log("af");
 
         if (game_type == 1)
             Invoke("ResetSecondary", 1f);
 
         player.can_play = true;
-
-        Debug.Log("ag");
     }
 
     public void ResetSecondary()
