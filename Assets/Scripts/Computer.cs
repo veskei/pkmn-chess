@@ -99,7 +99,7 @@ public class Computer : MonoBehaviour
         else
         {
             gm_script.MovePiece(current_piece, target_square);
-            //Debug.Log(FEN_Notation());
+
         }
     }
 }
